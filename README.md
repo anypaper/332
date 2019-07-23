@@ -32,7 +32,9 @@ To compile and run NRG you will need access to the following repositories:
 P4-NetFPGA and Emu are required only to run P4 and Emu based mini-blocks. 
 
 
-# Blinding
+# Important: Blinding Disclaimer
 
-This repository contains in some files copyrights of authors and named sources, especially under the NRG/hw/ folder. These are not unblinding the code, but are inherited from the NetFPGA repositories under the NetFPGA C.I.C redistribution license. 
+This repository contains some files with copyrights of authors and named sources, especially under the NRG/hw/ folder. These are not unblinding the code, but were inherited from the NetFPGA repositories under the NetFPGA C.I.C redistribution license. 
+
+Every effort was taken as part of this release to blind any identifying information of the authors. 
 

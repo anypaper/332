@@ -1,0 +1,31 @@
+Detected project directory: /home/xxx//spark-perf
+Loading configuration from /home/xxx//spark-perf/config/config.py
+Building perf tests...
+***************************
+WARNING: the following command contains a semicolon which may cause non-zero return values to be ignored. This isn't necessarily a problem, but proceed with caution!
+cd /home/xxx//spark-perf/mllib-tests; sbt/sbt -Dspark.version=1.5.0 clean assembly
+--------------------------------------------------------------------
+Running 1 tests in MLlib-Tests.
+
+--------------------------------------------------------------------
+Running test command: 'mllib.perf.TestRunner' ...
+ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 10.0.3.8 'ps -ef | grep -v grep | grep ExecutorBackend'
+
+Setting env var SPARK_SUBMIT_OPTS: -Dspark.storage.memoryFraction=0.66 -Dspark.serializer=org.apache.spark.serializer.KyroSerializer -Dspark.java.library.path=/usr/share/java -Dspark.executor.memory=20g -Dspark.locality.wait=60000000 -Dspark.shuffle.manager=SORT -Dsparkperf.commitSHA=unknown
+Running command: /home/xxx//spark/bin/spark-submit --class mllib.perf.TestRunner --master spark://10.0.3.7:7077 --driver-memory 20g /home/xxx//spark-perf/mllib-tests/target/mllib-perf-tests-assembly.jar glm-regression --num-trials=2 --inter-trial-wait=3 --num-partitions=1 --random-seed=5 --num-examples=100 --feature-noise=1.0 --num-features=50000 --num-iterations=900 --step-size=0.001 --reg-type=l2 --reg-param=0.1 --elastic-net-param=0.0 --optimizer=sgd --intercept=0.0 --label-noise=0.1 --loss=l2 1>> /home/xxx//spark/../../data/mllib_perf_output__2018-07-02_14-29-29_logs/glm-regression.out 2>> /home/xxx//spark/../../data/mllib_perf_output__2018-07-02_14-29-29_logs/glm-regression.err
+
+--------------------------------------------------------------------
+
+Result: glm-regression, glm-regression --num-trials=2 --inter-trial-wait=3 --num-partitions=1 --random-seed=5 --num-examples=100 --feature-noise=1.0 --num-features=50000 --num-iterations=900 --step-size=0.001 --reg-type=l2 --reg-param=0.1 --elastic-net-param=0.0 --optimizer=sgd --intercept=0.0 --label-noise=0.1 --loss=l2
+Training time: 63.965, 0.000, 63.965, 63.965, 63.965
+Test time: 0.056, 0.000, 0.056, 0.056, 0.056
+Training Set Metric: 0.0481890873558, 0.000, 0.0481890873558, 0.0481890873558, 0.0481890873558
+Test Set Metric: 78.8636335889, 0.000, 78.8636335889, 78.8636335889, 78.8636335889
+--------------------------------------------------------------------
+
+Finished running 1 tests in MLlib-Tests.
+See summary in /home/xxx//spark/../../data/mllib_perf_output__2018-07-02_14-29-29
+
+Number of failed tests: 0, failed tests: 
+--------------------------------------------------------------------
+Finished running all tests.

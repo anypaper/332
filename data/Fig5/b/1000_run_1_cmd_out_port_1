@@ -1,0 +1,12 @@
+Exact-Capture 1.0RC (00200000-00000080)
+Copyright Exablaze Pty Ltd 2018
+Exact Capture running... | Exact Capture running... | Exact Capture running... / Exact Capture running... - Exact Capture running... \ Exact Capture running... | Exact Capture running... / Exact Capture running... - Exact Capture running... \ Exact Capture running... | Exact Capture running... / Exact Capture running... - Exact Capture finished
+    SW Received: 1000000 packets ( 0.096 MP/s )
+                      64 MB      ( 0.052 Gb/s )
+       SW Wrote: 1000000 packets ( 0.096 MP/s )
+                      64 MB      ( 0.052 Gb/s )
+     Lost RX/WR:       0 packets ( 0.000 MP/s )
+                       0 MB      ( 0.000 Gb/s )
+        Dropped:       0 packets ( 0.000 MP/s )
+   SW Overflows:       0 times   ( 0.000 /s   )
+

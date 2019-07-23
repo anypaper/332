@@ -1,0 +1,13 @@
+#type       avg     std     min     5th    10th    90th    95th    99th
+read       35.8    48.8    13.1    23.4    25.0    46.6    53.6    72.9
+update     40.2    59.3    17.4    26.5    28.4    51.8    58.5    78.8
+op_q        1.0     0.0     1.0     1.0     1.0     1.1     1.1     1.1
+
+Total QPS = 100078.5 (2001570 / 20.0s)
+
+Misses = 282213 (14.6%)
+Skipped TXs = 0 (0.0%)
+
+RX  403763243 bytes :   19.3 MB/s
+TX   97627883 bytes :    4.7 MB/s
+Saving latency samples to /root/xxx/memcached-output/memcached_mutilate_out_1.
