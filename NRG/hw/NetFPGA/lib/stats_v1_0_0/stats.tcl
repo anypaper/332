@@ -1,4 +1,5 @@
 #
+# Copyright (c) 2015
 # All rights reserved.
 #
 #
@@ -27,7 +28,7 @@ set design stats
 set top stats
 set device xc7vx690t-3-ffg1761
 set proj_dir ./ip_proj
-set ip_version 1.00
+set ip_version 1.01
 set lib_name NetFPGA
 #####################################
 # set IP paths

@@ -168,6 +168,18 @@ parameter C_S_AXI_ADDR_WIDTH    = 32
     output  reg                         ppsmem_cmd_valid,
     input       [`MEM_PPSMEM_DATA_BITS]    ppsmem_reply,
     input                               ppsmem_reply_valid,
+    output  reg [`MEM_BWCDFMEM_ADDR_BITS]    bwcdfmem_addr,
+    output  reg [`MEM_BWCDFMEM_DATA_BITS]    bwcdfmem_data,
+    output  reg                         bwcdfmem_rd_wrn,
+    output  reg                         bwcdfmem_cmd_valid,
+    input       [`MEM_BWCDFMEM_DATA_BITS]    bwcdfmem_reply,
+    input                               bwcdfmem_reply_valid,
+    output  reg [`MEM_PPSCDFMEM_ADDR_BITS]    ppscdfmem_addr,
+    output  reg [`MEM_PPSCDFMEM_DATA_BITS]    ppscdfmem_data,
+    output  reg                         ppscdfmem_rd_wrn,
+    output  reg                         ppscdfmem_cmd_valid,
+    input       [`MEM_PPSCDFMEM_DATA_BITS]    ppscdfmem_reply,
+    input                               ppscdfmem_reply_valid,
     output  reg [`MEM_FLOWIDMEM_ADDR_BITS]    flowidmem_addr,
     output  reg [`MEM_FLOWIDMEM_DATA_BITS]    flowidmem_data,
     output  reg                         flowidmem_rd_wrn,
@@ -1695,6 +1707,38 @@ parameter C_S_AXI_ADDR_WIDTH    = 32
        
        always @(posedge clk) begin
          if  (~resetn_sync) begin
+           bwcdfmem_addr <= #1 0;
+           bwcdfmem_data <= #1 0;
+           bwcdfmem_rd_wrn<= #1 0;
+           bwcdfmem_cmd_valid <= #1 0;
+         end 
+         else begin
+           bwcdfmem_addr <= #1 indirect_address;
+           bwcdfmem_data <= #1 indirectwrdata_reg;
+           bwcdfmem_rd_wrn<= #1 indirect_type;
+           bwcdfmem_cmd_valid <= #1 (32'h60000000==(indirect_memory_select<<28)) && ((indirect_state == WRITE_INDIRECT_STATE) || (indirect_state == READ_INDIRECT_STATE));
+         end 
+       end
+
+       
+       always @(posedge clk) begin
+         if  (~resetn_sync) begin
+           ppscdfmem_addr <= #1 0;
+           ppscdfmem_data <= #1 0;
+           ppscdfmem_rd_wrn<= #1 0;
+           ppscdfmem_cmd_valid <= #1 0;
+         end 
+         else begin
+           ppscdfmem_addr <= #1 indirect_address;
+           ppscdfmem_data <= #1 indirectwrdata_reg;
+           ppscdfmem_rd_wrn<= #1 indirect_type;
+           ppscdfmem_cmd_valid <= #1 (32'h70000000==(indirect_memory_select<<28)) && ((indirect_state == WRITE_INDIRECT_STATE) || (indirect_state == READ_INDIRECT_STATE));
+         end 
+       end
+
+       
+       always @(posedge clk) begin
+         if  (~resetn_sync) begin
            flowidmem_addr <= #1 0;
            flowidmem_data <= #1 0;
            flowidmem_rd_wrn<= #1 0;
@@ -1704,7 +1748,7 @@ parameter C_S_AXI_ADDR_WIDTH    = 32
            flowidmem_addr <= #1 indirect_address;
            flowidmem_data <= #1 indirectwrdata_reg;
            flowidmem_rd_wrn<= #1 indirect_type;
-           flowidmem_cmd_valid <= #1 (32'h60000000==(indirect_memory_select<<28)) && ((indirect_state == WRITE_INDIRECT_STATE) || (indirect_state == READ_INDIRECT_STATE));
+           flowidmem_cmd_valid <= #1 (32'h80000000==(indirect_memory_select<<28)) && ((indirect_state == WRITE_INDIRECT_STATE) || (indirect_state == READ_INDIRECT_STATE));
          end 
        end
 
@@ -1720,7 +1764,7 @@ parameter C_S_AXI_ADDR_WIDTH    = 32
            windowsizemem_addr <= #1 indirect_address;
            windowsizemem_data <= #1 indirectwrdata_reg;
            windowsizemem_rd_wrn<= #1 indirect_type;
-           windowsizemem_cmd_valid <= #1 (32'h70000000==(indirect_memory_select<<28)) && ((indirect_state == WRITE_INDIRECT_STATE) || (indirect_state == READ_INDIRECT_STATE));
+           windowsizemem_cmd_valid <= #1 (32'h90000000==(indirect_memory_select<<28)) && ((indirect_state == WRITE_INDIRECT_STATE) || (indirect_state == READ_INDIRECT_STATE));
          end 
        end
 
@@ -1730,8 +1774,8 @@ parameter C_S_AXI_ADDR_WIDTH    = 32
              indirect_reply_valid <= #1 0; 
           end 
           else begin 
-             indirectreply_reg <= #1 32'h0==(indirect_memory_select<<28) ? pktsizemem_reply :32'h10000000==(indirect_memory_select<<28) ? ipgmem_reply :32'h20000000==(indirect_memory_select<<28) ? burstmem_reply :32'h30000000==(indirect_memory_select<<28) ? bwmem_reply :32'h40000000==(indirect_memory_select<<28) ? bwtsmem_reply :32'h50000000==(indirect_memory_select<<28) ? ppsmem_reply :32'h60000000==(indirect_memory_select<<28) ? flowidmem_reply :32'h70000000==(indirect_memory_select<<28) ? windowsizemem_reply : 0;
-      indirect_reply_valid <= #1 32'h0==(indirect_memory_select<<28) ? pktsizemem_reply_valid :32'h10000000==(indirect_memory_select<<28) ? ipgmem_reply_valid :32'h20000000==(indirect_memory_select<<28) ? burstmem_reply_valid :32'h30000000==(indirect_memory_select<<28) ? bwmem_reply_valid :32'h40000000==(indirect_memory_select<<28) ? bwtsmem_reply_valid :32'h50000000==(indirect_memory_select<<28) ? ppsmem_reply_valid :32'h60000000==(indirect_memory_select<<28) ? flowidmem_reply_valid :32'h70000000==(indirect_memory_select<<28) ? windowsizemem_reply_valid : 0;
+             indirectreply_reg <= #1 32'h0==(indirect_memory_select<<28) ? pktsizemem_reply :32'h10000000==(indirect_memory_select<<28) ? ipgmem_reply :32'h20000000==(indirect_memory_select<<28) ? burstmem_reply :32'h30000000==(indirect_memory_select<<28) ? bwmem_reply :32'h40000000==(indirect_memory_select<<28) ? bwtsmem_reply :32'h50000000==(indirect_memory_select<<28) ? ppsmem_reply :32'h60000000==(indirect_memory_select<<28) ? bwcdfmem_reply :32'h70000000==(indirect_memory_select<<28) ? ppscdfmem_reply :32'h80000000==(indirect_memory_select<<28) ? flowidmem_reply :32'h90000000==(indirect_memory_select<<28) ? windowsizemem_reply : 0;
+      indirect_reply_valid <= #1 32'h0==(indirect_memory_select<<28) ? pktsizemem_reply_valid :32'h10000000==(indirect_memory_select<<28) ? ipgmem_reply_valid :32'h20000000==(indirect_memory_select<<28) ? burstmem_reply_valid :32'h30000000==(indirect_memory_select<<28) ? bwmem_reply_valid :32'h40000000==(indirect_memory_select<<28) ? bwtsmem_reply_valid :32'h50000000==(indirect_memory_select<<28) ? ppsmem_reply_valid :32'h60000000==(indirect_memory_select<<28) ? bwcdfmem_reply_valid :32'h70000000==(indirect_memory_select<<28) ? ppscdfmem_reply_valid :32'h80000000==(indirect_memory_select<<28) ? flowidmem_reply_valid :32'h90000000==(indirect_memory_select<<28) ? windowsizemem_reply_valid : 0;
           end 
         end
   

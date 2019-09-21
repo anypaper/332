@@ -1,12 +1,7 @@
 //-
-// Copyright (c) 2015 Noa Zilberman, Georgina Kalogeridou
+// Copyright (c) 2015 
 // All rights reserved.
 //
-// This software was developed by Stanford University and the University of Cambridge Computer Laboratory 
-// under National Science Foundation under Grant No. CNS-0855268,
-// the University of Cambridge Computer Laboratory under EPSRC INTERNET Project EP/H040536/1 and
-// by the University of Cambridge Computer Laboratory under DARPA/AFRL contract FA8750-11-C-0249 ("MRC2"), 
-// as part of the DARPA MRC research programme.
 //
 //  File:
 //        top_sim.v
@@ -14,10 +9,10 @@
 //  Module:
 //        top
 //
-//  Author: Noa Zilberman, Georgina Kalogeridou
+//  Author:
 //
 //  Description:
-//        reference nic top module
+//        top module
 //
 // @NETFPGA_LICENSE_HEADER_START@
 //

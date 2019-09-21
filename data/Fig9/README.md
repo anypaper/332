@@ -1,10 +1,9 @@
 # Figure 9
 
-This directory contains the data used to generate Figure 9.
+This directory contains the data used to generate Figure 9 and additional data collected from NRG as part of the experiment.
 
-This directory contains three sub directories, each folder corresponding to a subfigure, each with the two NRG log files that were used to plot the figure. These are the raw files
-read from the device.
+The folders are names tensorflow_<latency>. Each folder contains the original log files collected from NRG. 
 
-intel_<property> indicates a measurement taken in the setup using an Intel NIC.
+Port 0 is the link from the switch to the server (Master).
 
-sf_<property> indicates a measurement taken in the setup using a Solarflare NIC.
+Port 1 is the link from the server (Master) to the switch.

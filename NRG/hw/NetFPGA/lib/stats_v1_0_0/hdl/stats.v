@@ -1,5 +1,7 @@
 //-
+// Copyright (C) 2016 
 // All rights reserved.
+//
 //
 // @NETFPGA_LICENSE_HEADER_START@
 //
@@ -30,7 +32,7 @@
  *        stats
  *
  *  Author:
- * 		
+* 		
  *  Description:
  *        A simple statsitics collection module
  *
@@ -255,6 +257,18 @@ module stats
     wire                              ppsmem_cmd_valid;
     reg       [`MEM_PPSMEM_DATA_BITS]    ppsmem_reply;
     reg                               ppsmem_reply_valid;
+    wire      [`MEM_BWCDFMEM_ADDR_BITS]    bwcdfmem_addr;
+    wire      [`MEM_BWCDFMEM_DATA_BITS]    bwcdfmem_data;
+    wire                              bwcdfmem_rd_wrn;
+    wire                              bwcdfmem_cmd_valid;
+    reg       [`MEM_BWCDFMEM_DATA_BITS]    bwcdfmem_reply;
+    reg                               bwcdfmem_reply_valid;
+    wire      [`MEM_PPSCDFMEM_ADDR_BITS]    ppscdfmem_addr;
+    wire      [`MEM_PPSCDFMEM_DATA_BITS]    ppscdfmem_data;
+    wire                              ppscdfmem_rd_wrn;
+    wire                              ppscdfmem_cmd_valid;
+    reg       [`MEM_PPSCDFMEM_DATA_BITS]    ppscdfmem_reply;
+    reg                               ppscdfmem_reply_valid;
     wire      [`MEM_FLOWIDMEM_ADDR_BITS]    flowidmem_addr;
     wire      [`MEM_FLOWIDMEM_DATA_BITS]    flowidmem_data;
     wire                              flowidmem_rd_wrn;
@@ -360,7 +374,7 @@ fallthrough_small_fifo
          .empty                          (empty),
          // Inputs
          .din                            ({s_axis_tready,s_axis_tlast, s_axis_tuser, s_axis_tkeep, s_axis_tdata}),
-         .wr_en                          (s_axis_tvalid & ~nearly_full),
+         .wr_en                          (s_axis_tvalid & s_axis_tready & ~nearly_full),
          .rd_en                          (rd_en),
          .reset                          (~axis_resetn),
          .clk                            (axis_aclk)
@@ -691,11 +705,23 @@ wire [12:0] bw_mem_addrb;
 wire [31:0] bw_mem_din;
 wire [31:0] bw_mem_dout;
 
+wire bw_cdf_mem_we;
+wire [12:0] bw_cdf_mem_addra;
+wire [12:0] bw_cdf_mem_addrb;
+wire [31:0] bw_cdf_mem_din;
+wire [31:0] bw_cdf_mem_dout;
+
 wire pps_mem_we;
 wire [12:0] pps_mem_addra;
 wire [12:0] pps_mem_addrb;
 wire [31:0] pps_mem_din;
 wire [31:0] pps_mem_dout;
+
+wire pps_cdf_mem_we;
+wire [12:0] pps_cdf_mem_addra;
+wire [12:0] pps_cdf_mem_addrb;
+wire [31:0] pps_cdf_mem_din;
+wire [31:0] pps_cdf_mem_dout;
 
 reg bw_we;
 reg [12:0] bw_addra;
@@ -717,6 +743,23 @@ wire [31:0] pps_dout;
 //reg pps_next_rd_reply;
 reg ppsmem_next_rd_reply,ppsmem_next_rd_reply2;
 reg [31:0] pps_counter;
+
+reg bw_cdf_we; 
+reg [12:0] bw_cdf_addra;
+reg [12:0] bw_cdf_addrb,bw_cdf_addrb2,bw_cdf_addrb3;
+reg [31:0] bw_cdf_din;
+wire [31:0] bw_cdf_dout;
+reg bw_cdf_next_rd_reply,bw_cdf_next_rd_reply2,bw_cdf_next_rd_reply3;
+reg bwcdfmem_next_rd_reply,bwcdfmem_next_rd_reply2;
+
+reg pps_cdf_we;
+reg [12:0] pps_cdf_addra;
+reg [12:0] pps_cdf_addrb,pps_cdf_addrb2,pps_cdf_addrb3;
+reg [31:0] pps_cdf_din;
+wire [31:0] pps_cdf_dout;
+reg pps_cdf_next_rd_reply,pps_cdf_next_rd_reply2,pps_cdf_next_rd_reply3;
+reg ppscdfmem_next_rd_reply,ppscdfmem_next_rd_reply2;
+
 
 
 wire bw_tsmem_we;
@@ -755,6 +798,33 @@ reg [33:0] bw_delay;
     .doutb(pps_mem_dout)  // output wire [31 : 0] doutb
   ); 
 
+
+ stats_mem bw_cdf_mem (
+    .clka(axis_aclk),    // input wire clka
+    .ena(axis_resetn),      // input wire ena
+    .wea(bw_cdf_mem_we),      // input wire [0 : 0] wea
+    .addra(bw_cdf_mem_addra),  // input wire [12 : 0] addra
+    .dina(bw_cdf_mem_din),    // input wire [31 : 0] dina
+    .clkb(axis_aclk),    // input wire clkb
+    .enb(axis_resetn),      // input wire enb
+    .addrb(bw_cdf_mem_addrb),  // input wire [12 : 0] addrb
+    .doutb(bw_cdf_mem_dout)  // output wire [31 : 0] doutb
+  ); 
+
+ stats_mem pps_cdf_mem (
+    .clka(axis_aclk),    // input wire clka
+    .ena(axis_resetn),      // input wire ena
+    .wea(pps_cdf_mem_we),      // input wire [0 : 0] wea
+    .addra(pps_cdf_mem_addra),  // input wire [12 : 0] addra
+    .dina(pps_cdf_mem_din),    // input wire [31 : 0] dina
+    .clkb(axis_aclk),    // input wire clkb
+    .enb(axis_resetn),      // input wire enb
+    .addrb(pps_cdf_mem_addrb),  // input wire [12 : 0] addrb
+    .doutb(pps_cdf_mem_dout)  // output wire [31 : 0] doutb
+  ); 
+
+
+
  stats_mem bw_tsmem (
     .clka(axis_aclk),    // input wire clka
     .ena(axis_resetn),      // input wire ena
@@ -777,6 +847,17 @@ assign pps_mem_we    = ppsmem_cmd_valid & !ppsmem_rd_wrn ? 1'b1 : bw_we;
 assign pps_mem_addra = ppsmem_cmd_valid & !ppsmem_rd_wrn ? ppsmem_addr : bw_addra;
 assign pps_mem_din   = ppsmem_cmd_valid & !ppsmem_rd_wrn ? ppsmem_data : pps_din;
 assign pps_mem_addrb = ppsmem_cmd_valid & ppsmem_rd_wrn ? ppsmem_addr : bw_addrb;
+
+assign bw_cdf_mem_we    = bwcdfmem_cmd_valid & !bwcdfmem_rd_wrn ? 1'b1 : bw_cdf_we;
+assign bw_cdf_mem_addra = bwcdfmem_cmd_valid & !bwcdfmem_rd_wrn ? bwcdfmem_addr : bw_cdf_addra;
+assign bw_cdf_mem_din   = bwcdfmem_cmd_valid & !bwcdfmem_rd_wrn ? bwcdfmem_data : bw_cdf_din;
+assign bw_cdf_mem_addrb = bwcdfmem_cmd_valid & bwcdfmem_rd_wrn ? bwcdfmem_addr : bw_cdf_addrb;
+
+assign pps_cdf_mem_we    = ppscdfmem_cmd_valid & !ppscdfmem_rd_wrn ? 1'b1 : bw_we;
+assign pps_cdf_mem_addra = ppscdfmem_cmd_valid & !ppscdfmem_rd_wrn ? ppscdfmem_addr : pps_cdf_addra;
+assign pps_cdf_mem_din   = ppscdfmem_cmd_valid & !ppscdfmem_rd_wrn ? ppscdfmem_data : pps_cdf_din;
+assign pps_cdf_mem_addrb = ppscdfmem_cmd_valid & ppscdfmem_rd_wrn ? ppscdfmem_addr : pps_cdf_addrb;
+
 
 assign bw_tsmem_we    = bwtsmem_cmd_valid & !bwtsmem_rd_wrn ? 1'b1 : bw_we;
 assign bw_tsmem_addra = bwtsmem_cmd_valid & !bwtsmem_rd_wrn ? bwtsmem_addr : bw_addra;
@@ -812,6 +893,37 @@ always @(posedge axis_aclk)
 		ppsmem_reply_valid <= #1 ppsmem_next_rd_reply2;
 		ppsmem_reply <= #1 ppsmem_next_rd_reply2 ? pps_mem_dout : ppsmem_reply;
         end
+
+//indirect bw cdf memory access read reply
+always @(posedge axis_aclk)
+	if (~resetn_sync | reset_registers) begin
+		bwcdfmem_reply <= #1 0;
+		bwcdfmem_reply_valid	<= #1 1'b0;
+		bwcdfmem_next_rd_reply <= 1'b0;
+		bwcdfmem_next_rd_reply2 <= 1'b0;
+	end
+	else begin
+		bwcdfmem_next_rd_reply <= #1 bwcdfmem_cmd_valid & bwcdfmem_rd_wrn;
+		bwcdfmem_next_rd_reply2 <= #1 bwcdfmem_next_rd_reply;
+		bwcdfmem_reply_valid <= #1 bwcdfmem_next_rd_reply2;
+		bwcdfmem_reply <= #1 bwcdfmem_next_rd_reply2 ? bw_cdf_mem_dout : bwcdfmem_reply;
+        end
+
+//indirect pps cdf memory access read reply
+always @(posedge axis_aclk)
+	if (~resetn_sync | reset_registers) begin
+		ppscdfmem_reply <= #1 0;
+		ppscdfmem_reply_valid	<= #1 1'b0;
+		ppscdfmem_next_rd_reply <= 1'b0;
+		ppscdfmem_next_rd_reply2 <= 1'b0;
+	end
+	else begin
+		ppscdfmem_next_rd_reply <= #1 ppscdfmem_cmd_valid & ppscdfmem_rd_wrn;
+		ppscdfmem_next_rd_reply2 <= #1 ppscdfmem_next_rd_reply;
+		ppscdfmem_reply_valid <= #1 ppscdfmem_next_rd_reply2;
+		ppscdfmem_reply <= #1 ppscdfmem_next_rd_reply2 ? pps_cdf_mem_dout : ppscdfmem_reply;
+        end
+
 
 //indirect timestamp memory access read reply
 always @(posedge axis_aclk)
@@ -861,7 +973,7 @@ always @(posedge axis_aclk)
 				    new_packet & !empty? (fifo_tuser[12:0]+bytes_counter < 65'h10000000000000000 ? fifo_tuser[12:0]+bytes_counter :  64'hFFFFFFFFFFFFFFFF) 
                                    : bytes_counter;
 		pps_counter <= #1 (ip2cpu_testtrigger_reg[0] == 0) | (bw_go==1'b0)| !(bw_delay==0) | reset_registers | clear_counters ? 32'h0 :  bw_update ? 32'h0 :
-				    new_packet & !empty? (bytes_counter+1 < 33'h10000000000000000 ? bytes_counter+32'h1 :  32'hFFFFFFFF) 
+				    new_packet & !empty? ((pps_counter<32'hFFFFFFFF) ? pps_counter+32'h1 :  32'hFFFFFFFF) 
                                    : pps_counter;
 		bw_go <= #1 (ip2cpu_testtrigger_reg[0] == 0) | reset_registers | clear_counters ? 1'b0 : (ip2cpu_testtrigger_reg[4] == 0) ? 1'b1 : new_packet & !empty ? 1'b1 : bw_go;
 		bw_delay <= #1 (ip2cpu_testtrigger_reg[0] == 0) | reset_registers | clear_counters ? ip2cpu_testtrigger_reg[31:8]<<10 : 
@@ -870,6 +982,60 @@ always @(posedge axis_aclk)
 		bw_ts_counter <= #1 (ip2cpu_testtrigger_reg[0] == 0) | (bw_go==1'b0)| !(bw_delay==0) | reset_registers | clear_counters ? 32'h0 :  (bw_timer == ip2cpu_bwgranularity_reg) ? bw_ts_counter + 1: bw_ts_counter;
         end
 
+
+//BW CDF statistics update
+always @(posedge axis_aclk)
+	if (~resetn_sync | reset_registers) begin
+		bw_cdf_we <= #1 1'b0;
+		bw_cdf_addra <= #1 0;
+		bw_cdf_addrb <= #1 0;
+		bw_cdf_addrb2 <= #1 0;
+		bw_cdf_addrb3 <= #1 0;
+		bw_cdf_din   <= #1 0;
+		bw_cdf_next_rd_reply <= #1 1'b0;
+		bw_cdf_next_rd_reply2<= #1 1'b0;
+		bw_cdf_next_rd_reply3<= #1 1'b0;
+		
+	end
+	else begin
+		bw_cdf_we <= #1 bw_cdf_next_rd_reply3;
+		bw_cdf_addra <= #1 bw_cdf_addrb3;
+		bw_cdf_addrb2 <= #1 bw_cdf_addrb;
+		bw_cdf_addrb3 <= #1 bw_cdf_addrb2;
+		bw_cdf_addrb <= #1 bw_go & (bw_delay==0) ?( (bytes_counter < 32'h400) ? bytes_counter : bytes_counter < 32'h100000 ? 13'h400+(bytes_counter>>10) : 
+				bytes_counter < 32'h40000000 ? 13'h800+(bytes_counter>>20) : 13'h1FFF) :  bw_cdf_addrb; 
+		bw_cdf_din   <= #1 bw_cdf_next_rd_reply3 ? bw_cdf_mem_dout +1 : bw_cdf_din;
+		bw_cdf_next_rd_reply <= #1 bwcdfmem_cmd_valid & bwcdfmem_rd_wrn ? 1'b0 : bw_update;
+		bw_cdf_next_rd_reply2 <= #1 bw_cdf_next_rd_reply;
+		bw_cdf_next_rd_reply3 <= #1 bw_cdf_next_rd_reply2;
+        end
+
+//PPSs CDF statistics update
+always @(posedge axis_aclk)
+	if (~resetn_sync | reset_registers) begin
+		pps_cdf_we <= #1 1'b0;
+		pps_cdf_addra <= #1 0;
+		pps_cdf_addrb <= #1 0;
+		pps_cdf_addrb2 <= #1 0;
+		pps_cdf_addrb3 <= #1 0;
+		pps_cdf_din   <= #1 0;
+		pps_cdf_next_rd_reply <= #1 1'b0;
+		pps_cdf_next_rd_reply2<= #1 1'b0;
+		pps_cdf_next_rd_reply3<= #1 1'b0;
+		
+	end
+	else begin
+		pps_cdf_we <= #1 pps_cdf_next_rd_reply3;
+		pps_cdf_addra <= #1 pps_cdf_addrb3;
+		pps_cdf_addrb2 <= #1 pps_cdf_addrb; 
+		pps_cdf_addrb3 <= #1 pps_cdf_addrb2;
+		pps_cdf_addrb <= #1 bw_go & (bw_delay==0)? ((pps_counter < 32'h400) ? pps_counter : pps_counter < 32'h100000 ? 13'h400+(pps_counter>>10) : 
+				pps_counter < 32'h40000000 ? 13'h800+(pps_counter>>20) : 13'h1FFF) :  pps_cdf_addrb; 
+		pps_cdf_din   <= #1 pps_cdf_next_rd_reply3 ? pps_cdf_mem_dout +1 : pps_cdf_din;
+		pps_cdf_next_rd_reply <= #1 ppscdfmem_cmd_valid & ppscdfmem_rd_wrn ? 1'b0 : bw_update ;
+		pps_cdf_next_rd_reply2 <= #1 pps_cdf_next_rd_reply;
+		pps_cdf_next_rd_reply3 <= #1 pps_cdf_next_rd_reply2;
+        end
 
 /////////////////////////////////////
 //Window size statistics
@@ -1098,6 +1264,18 @@ always @(posedge axis_aclk)
     .ppsmem_cmd_valid     (ppsmem_cmd_valid ),
     .ppsmem_reply         (ppsmem_reply),
     .ppsmem_reply_valid   (ppsmem_reply_valid),
+   .bwcdfmem_addr          (bwcdfmem_addr),
+    .bwcdfmem_data          (bwcdfmem_data),
+    .bwcdfmem_rd_wrn        (bwcdfmem_rd_wrn),
+    .bwcdfmem_cmd_valid     (bwcdfmem_cmd_valid ),
+    .bwcdfmem_reply         (bwcdfmem_reply),
+    .bwcdfmem_reply_valid   (bwcdfmem_reply_valid),
+    .ppscdfmem_addr          (ppscdfmem_addr),
+    .ppscdfmem_data          (ppscdfmem_data),
+    .ppscdfmem_rd_wrn        (ppscdfmem_rd_wrn),
+    .ppscdfmem_cmd_valid     (ppscdfmem_cmd_valid ),
+    .ppscdfmem_reply         (ppscdfmem_reply),
+    .ppscdfmem_reply_valid   (ppscdfmem_reply_valid),
     .flowidmem_addr          (flowidmem_addr),
     .flowidmem_data          (flowidmem_data),
     .flowidmem_rd_wrn        (flowidmem_rd_wrn),

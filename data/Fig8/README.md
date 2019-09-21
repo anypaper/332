@@ -1,9 +1,9 @@
 # Figure 8
 
-This directory contains the data used to generate Figure 8.
+This directory contains the data used to generate Figure 8 and additional data collected from NRG as part of the experiments.
 
-The folders are names tensorflow_<latency>. Each folder contains the original log files collected from NRG. 
+Folder a contains the NRG files collected as part of the Tensorflow experiment (10Gbps bandwidth).
 
-Port 0 is the link from the switch to the server (Master).
+Folder b-c contains the NRG files collected as part of the Apache experiment (10Gbps bandwidth).
 
-Port 1 is the link from the server (Master) to the switch.
+Each of the folders contains all the NRG files collected, not only link utilization. Link utilization files are named bw_cdf.log. Measurement resolution is 100us.

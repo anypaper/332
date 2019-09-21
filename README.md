@@ -4,6 +4,14 @@ This is a blinded repo dedicated to submission 332.
 
 The repo is blinded using Anonymous GitHub for Open-Science (https://anonymous.4open.science/).
 
+# Important: Blinding Disclaimer
+
+This repository contains some files with copyrights of authors and named sources, especially under the NRG/hw/ folder. These are not unblinding the code, but were inherited from the NetFPGA repositories under the NetFPGA C.I.C redistribution license. 
+
+Every effort was taken as part of this release to blind any identifying information of the authors. 
+
+
+
 # Structure
 
 This repository includes NRG's code and supporting data. Pcap traces are omitted due to their size. 
@@ -31,10 +39,4 @@ To compile and run NRG you will need access to the following repositories:
 
 P4-NetFPGA and Emu are required only to run P4 and Emu based mini-blocks. 
 
-
-# Important: Blinding Disclaimer
-
-This repository contains some files with copyrights of authors and named sources, especially under the NRG/hw/ folder. These are not unblinding the code, but were inherited from the NetFPGA repositories under the NetFPGA C.I.C redistribution license. 
-
-Every effort was taken as part of this release to blind any identifying information of the authors. 
 
